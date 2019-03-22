@@ -51,6 +51,8 @@ void printQueue (queue::Queue &codaToken) {
 bool leggi(const string &str, queue::Queue &codaToken) {
   queue::createEmpty(codaToken);
 
+  int parentesi = 0;
+
   stringstream ss;
   ss << str;
 
@@ -62,10 +64,14 @@ bool leggi(const string &str, queue::Queue &codaToken) {
     token *t = new token();
     t->val = cToken;
 
-    if (cToken == "(")
+    if (cToken == "(") {
       t->k = PARENTESI_APERTA;
-    else if (cToken == ")")
+      parentesi++;
+    }
+    else if (cToken == ")") {
       t->k = PARENTESI_CHIUSA;
+      parentesi--;
+    }
     else if (cToken == "+")
       t->k = OP_SOMMA;
     else if (cToken == "-")
@@ -76,31 +82,28 @@ bool leggi(const string &str, queue::Queue &codaToken) {
       if (isNumber(cToken))
         t->k = NUMERO;
       else
-        t->k = SCONOSCIUTO;
+        return false;
     }
     
     queue::enqueue(t, codaToken);
   }
 
+  if (parentesi != 0)
+    return false;
+
   return true;
 }
 
-token* computeStack (stack::Stack codaToken) {
-  token* chiusa = stack::pop(codaToken);
-  //delete chiusa;
+token* computeStack (stack::Stack &stackToken) {
+  token* chiusa = stack::pop(stackToken);
+  delete chiusa;
 
-  token* op2Token = stack::pop(codaToken);
-  token* opToken = stack::pop(codaToken);
-  token* op1Token = stack::pop(codaToken);
+  token* op2Token = stack::pop(stackToken);
+  token* opToken = stack::pop(stackToken);
+  token* op1Token = stack::pop(stackToken);
 
-  token* aperta = stack::pop(codaToken);
-  //delete aperta;
-
-  cout << chiusa->val << flush;
-  cout << op2Token->val << flush;
-  cout << opToken->val << flush;
-  cout << op1Token->val << flush;
-  cout << aperta->val << flush;
+  token* aperta = stack::pop(stackToken);
+  delete aperta;
 
   int op2 = atoi(op2Token->val.c_str());
   int op1 = atoi(op1Token->val.c_str());
@@ -118,25 +121,28 @@ token* computeStack (stack::Stack codaToken) {
   e->k = NUMERO;
   e->val = to_string(result);
 
-  //delete op2Token;
-  //delete opToken;
-  //delete op1Token;
+  delete op2Token;
+  delete opToken;
+  delete op1Token;
 
   return e;
 }
 
 bool calcola(queue::Queue codaToken, int &risultato) {
-  stack::Stack stackToken;
+  stack::Stack stackToken = nullptr;
 
-  while (stackToken != nullptr) {
-    token* e = queue::dequeue(codaToken);
+  token* e = queue::dequeue(codaToken);
 
+  while (e != nullptr) {
     stack::push(e, stackToken);
 
-    if (e->k == PARENTESI_CHIUSA)
-      computeStack(stackToken);
+    if (e->k == PARENTESI_CHIUSA) {
+      stack::Elem res = computeStack(stackToken);
+      risultato = atoi(res->val.c_str());
+      stack::push(res, stackToken);
+    }
 
-    stackToken = stackToken->next;
+    e = queue::dequeue(codaToken);
   }
 
   return true;

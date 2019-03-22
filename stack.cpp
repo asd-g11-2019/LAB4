@@ -3,13 +3,13 @@
 using namespace stack;
 
 /****************************************************************/
-bool stack::isEmpty(const Stack& s)
+bool stack::isEmpty(const Stack &s)
 {
     return s == nullptr;
 }
 
 /****************************************************************/
-void stack::push(const Elem x, Stack& s) 
+void stack::push(const Elem x, Stack &s) 
 {
     stackCell* c = new stackCell;
     c->elem = x;
@@ -19,7 +19,7 @@ void stack::push(const Elem x, Stack& s)
 }
 
 /****************************************************************/
-Elem stack::pop(Stack& s)
+Elem stack::pop(Stack &s)
 {
     if (isEmpty(s))
         return EMPTY_ELEM;
@@ -30,7 +30,7 @@ Elem stack::pop(Stack& s)
 
     s = s->next;
 
-    //delete c;
+    delete c;
 
     return e;
 }
