@@ -20,6 +20,7 @@
 using std::cout;
 using std::cin;
 using std::string;
+using std::stringstream;
 using std::istringstream;
 using std::ostringstream;
 
@@ -31,7 +32,7 @@ enum kind {PARENTESI_APERTA, PARENTESI_CHIUSA, NUMERO, OP_SOMMA,
 OP_SOTTRAZIONE, OP_MOLTIPLICAZIONE, SCONOSCIUTO};
 
 struct token {
-  string val = "";
+  string val;
   kind k;
 };
 
@@ -50,5 +51,6 @@ string int2str(int n);
 // che diventa token.
 
 bool prossimoToken(string &s, token &t);
+bool prossimoToken(stringstream &ss, token *t);
 
 #endif /* TOKEN */

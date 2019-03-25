@@ -29,121 +29,110 @@ using std::ostringstream;
 // Funzioni principali: leggi() e calcola()
 /////////////////////////////////////////////////////////////////////
 
-bool isNumber (const string str) {
-  for (int i=0; i<str.length(); i++) {
-    if ( !std::isdigit(str[i]) )
-      return false;
-  }
-
-  return true;
-}
-
-void printQueue (queue::Queue &codaToken) {
-  queue::Elem e = queue::dequeue(codaToken);
-  while(e != queue::EMPTY_ELEM) {
-    printf("%d| %s\n", e->k, e->val.c_str());
-
-    e = queue::dequeue(codaToken);
-  }
-}
-
 // Estrae uno dopo l'altro i token dalla stringa "str", inserendoli via via nella coda "codaToken"
 bool leggi(const string &str, queue::Queue &codaToken) {
-  queue::createEmpty(codaToken);
+  queue::createEmpty(codaToken); // Creo una coda vuota
 
-  int parentesi = 0;
+  stringstream ss; // Inizializzo uno stringstream
+  ss << str; // Scrivo la striga nello stringsream
 
-  stringstream ss;
-  ss << str;
+  while (!ss.eof()) { // Finche' non termina lo stringstream
+    token *t = new token(); // Inizializzo il nuovo token
 
-  while (!ss.eof()) {
-    string cToken;
-
-    ss >> cToken;
-
-    token *t = new token();
-    t->val = cToken;
-
-    if (cToken == "(") {
-      t->k = PARENTESI_APERTA;
-      parentesi++;
-    }
-    else if (cToken == ")") {
-      t->k = PARENTESI_CHIUSA;
-      parentesi--;
-    }
-    else if (cToken == "+")
-      t->k = OP_SOMMA;
-    else if (cToken == "-")
-      t->k = OP_SOTTRAZIONE;
-    else if (cToken == "*")
-      t->k = OP_MOLTIPLICAZIONE;
-    else {
-      if (isNumber(cToken))
-        t->k = NUMERO;
-      else
-        return false;
-    }
+    if (!prossimoToken(ss, t)) // Se il token non e' valido
+      return false; // Restituisco errore
     
-    queue::enqueue(t, codaToken);
+    queue::enqueue(t, codaToken); // Inserisco il token nella queue
   }
-
-  if (parentesi != 0)
-    return false;
 
   return true;
 }
 
+// Elabora gli ultimi 5 token inseriti nello stack
+// e restituisce un token equivalente (il risultato sotto forma di numero)
+// Nel nostro caso riconosciamo l'errore sintattico con stack::ERROR
 token* computeStack (stack::Stack &stackToken) {
-  token* chiusa = stack::pop(stackToken);
-  delete chiusa;
+  token* chiusa = stack::pop(stackToken); // Ottengo il primo token
+  if (chiusa->k != PARENTESI_CHIUSA) // Se non e' una parentesi chiusa
+    return stack::ERROR; // Restituisco errore
+  delete chiusa; // Elimino il token dalla memoria
 
-  token* op2Token = stack::pop(stackToken);
-  token* opToken = stack::pop(stackToken);
-  token* op1Token = stack::pop(stackToken);
+  token* op2Token = stack::pop(stackToken); // Ottengo il secondo token
+  if (op2Token->k != NUMERO) //Se non e' un numero
+    return stack::ERROR; // Restituisco errore
 
-  token* aperta = stack::pop(stackToken);
-  delete aperta;
+  token* opToken = stack::pop(stackToken); // Ottengo il terzo token
+  if (opToken->k != OP_SOMMA && opToken->k != OP_SOTTRAZIONE && opToken->k != OP_MOLTIPLICAZIONE) // Se non e' un'operazione
+    return stack::ERROR; // Restituisco errore
 
-  int op2 = atoi(op2Token->val.c_str());
-  int op1 = atoi(op1Token->val.c_str());
+  token* op1Token = stack::pop(stackToken); // Ottengo il quarto token
+  if (op1Token->k != NUMERO) //Se non e' un numero
+    return stack::ERROR; // Restituisco errore
+
+  token* aperta = stack::pop(stackToken); // Ottengo il quinto token
+  if (aperta->k != PARENTESI_APERTA)
+    return stack::ERROR; // Restituisco errore
+  delete aperta; // Elimino il token dalla memoria
+
+  // Converto i due operandi in numeri interi
+  int op2 = str2int(op2Token->val);
+  int op1 = str2int(op1Token->val);
 
   int result = 0;
 
-  if (opToken->k == OP_SOMMA)
-    result = op1 + op2;
-  else if (opToken->k == OP_SOTTRAZIONE)
-    result = op1 - op2;
-  else if (opToken->k == OP_MOLTIPLICAZIONE)
-    result = op1 * op2;
+  switch (opToken->k) {
+    case OP_SOMMA: // Se l'operazione e' una somma
+      result = op1 + op2;
+      break; // Effettuo la somma
+    case OP_SOTTRAZIONE: // Se l'operazione e' una sottrazione
+      result = op1 - op2; // Effettuo la sottrazione
+      break;
+    case OP_MOLTIPLICAZIONE: // Se l'operazione e' una moltiplicazione
+      result = op1 * op2; // Effetuo la moltiplicazione
+      break;
+  }
 
-  stack::Elem e = new token;
-  e->k = NUMERO;
-  e->val = to_string(result);
 
+  stack::Elem e = new token; // Preparo il nuovo token
+  e->k = NUMERO; // Come numero
+  e->val = int2str(result); // E come valore il risultato
+
+  // Elimino i token dalla memoria
   delete op2Token;
   delete opToken;
   delete op1Token;
 
-  return e;
+  return e; // Restituisco il nuovo token
 }
 
 bool calcola(queue::Queue codaToken, int &risultato) {
-  stack::Stack stackToken = nullptr;
+  stack::Stack stackToken = stack::EMPTY_STACK; // Inizializzo uno stack vuoto
 
-  token* e = queue::dequeue(codaToken);
+  token* old; // Il penultimo token letto (servira' alla fine per controllare la validita')
+  token* e = queue::dequeue(codaToken); // L'ultimo token letto
 
-  while (e != nullptr) {
-    stack::push(e, stackToken);
+  while (e != stack::EMPTY_ELEM) { // Finche esiste un token nella coda
+    stack::push(e, stackToken); // Inserisco il token nello stack
 
-    if (e->k == PARENTESI_CHIUSA) {
-      stack::Elem res = computeStack(stackToken);
-      risultato = atoi(res->val.c_str());
-      stack::push(res, stackToken);
+    if (e->k == PARENTESI_CHIUSA) { // Se e' una parentesi chiusa
+      stack::Elem res = computeStack(stackToken); // Elaboro gli ulttimi 5 token dello stack
+
+      if (res == stack::ERROR) // Se c'e' stato un errore
+        return false; // Restituisco errore
+
+      stack::push(res, stackToken); // Inserisco il risultato nello stack
     }
 
-    e = queue::dequeue(codaToken);
+    old = e; // Metto da parte il token
+
+    e = queue::dequeue(codaToken); // E passo al successivo
   }
+
+  if (old->k != PARENTESI_CHIUSA) // Se l'ultimo token della cosa non e' una parentesi chiusa
+    return false; // Restituisco errore
+
+  stack::Elem result = stack::pop(stackToken); // Ottengo l'ultimo elemento rimasto nello stack
+  risultato = str2int(result->val); // Lo converto in numero intero e lo assegno al risultato
 
   return true;
 }

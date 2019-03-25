@@ -18,9 +18,11 @@ struct stackCell {
   stackCell* next;
 };
 
-const Elem EMPTY_ELEM = nullptr;
-
 typedef stackCell* Stack;
+
+const Elem ERROR = nullptr;
+const Elem EMPTY_ELEM = nullptr;
+const Stack EMPTY_STACK = nullptr;
 
 bool isEmpty(const Stack&);
 void push(const Elem, Stack&);	/* aggiunge elem in cima (operazione safe, si può sempre fare) */

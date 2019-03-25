@@ -2,55 +2,60 @@
 
 using namespace queue;
 
-
 /****************************************************************/
 /* 			FUNZIONI SULLE CODE 			*/
 /****************************************************************/
 
+// Come struttura base abbiamo scelto una lista doppiamente collegata e circolare con sentinella
+
 /****************************************************************/
 void queue::createEmpty(Queue& l) // aggiunge e in coda
 {
-   l = new queueCell;
-   l->next = l;
-   l->prev = l;
+  l = new queueCell; // Inizializzo una nuova cella (sentinella)
+
+  // Creo i collegamenti
+  l->next = l;
+  l->prev = l;
 }
 
 /****************************************************************/
 void queue::enqueue(Elem e, Queue& l) // aggiunge e in coda
 {
-   queueCell* c = new queueCell;
-   c->elem = e;
+  queueCell* c = new queueCell; // Inizializzo una nuova cella
+  c->elem = e; // Imposto l'elemento
 
-   c->next = l->next;
-   c->prev = l;
+  // Ricostruisco i collegamenti
+  c->next = l->next; 
+  c->prev = l;
 
-   l->next->prev = c;
-   l->next = c;
+  l->next->prev = c;
+  l->next = c;
 }
 
 
 /****************************************************************/
 Elem queue::dequeue(Queue& l) // rimuove il primo elemento e lo restituisce
 {
-   if (isEmpty(l))
-      return EMPTY_ELEM;
-   
-   queueCell* c = l->prev;
+  if (isEmpty(l)) // Se e' vuoto
+    return EMPTY_ELEM; // Non esiste alcun elemento
+  
+  queueCell* c = l->prev; // Ottengo l'ultima cella
 
-   Elem e = c->elem;
+  Elem e = c->elem; // Ottengo l'elemento
 
-   l->prev = c->prev;
-   c->prev->next = l;
+  // Ricostruisco i collegamenti
+  l->prev = c->prev;
+  c->prev->next = l;
 
-   delete c;
+  delete c; // Elimino la cella
 
-   return e;
+  return e; // Resituisco l'elemento
 }
 
 /****************************************************************/
 bool queue::isEmpty(const Queue& l)
 {
-  return l->next == l;
+  return l->next == l; // Se esiste solo la sentinella
 }
 
 /****************************************************************/
