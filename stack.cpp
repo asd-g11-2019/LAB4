@@ -15,10 +15,10 @@ bool stack::isEmpty(const Stack &s)
 }
 
 /****************************************************************/
-void stack::push(const Elem x, Stack &s) 
+void stack::push(const token x, Stack &s) 
 {
   stackCell* c = new stackCell; // Inizializzo la nuova cella
-  c->elem = x; // Imposto l'elemento
+  c->token = x; // Imposto l'elemento
 
   // Ricostruisco i collegamenti
   c->next = s;
@@ -26,14 +26,14 @@ void stack::push(const Elem x, Stack &s)
 }
 
 /****************************************************************/
-Elem stack::pop(Stack &s)
+token stack::pop(Stack &s)
 {
   if (isEmpty(s)) // Se e' vuoto
     return EMPTY_ELEM; // Non esiste alcun elemento
   
   stackCell* c = s; // Ottengo la cella da rimuovere
 
-  Elem e = s->elem; // Ottengo l'elemento
+  token e = s->token; // Ottengo l'elemento
 
   // Ricostruisco i collegamenti
   s = s->next;

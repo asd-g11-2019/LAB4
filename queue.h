@@ -10,12 +10,12 @@ namespace queue{
 
 
 // Gli elementi della QUEUE sono token
-typedef token* Elem;
+typedef token token;
 
-const Elem EMPTY_ELEM = nullptr;
+const token EMPTY_ELEM = { "", VUOTO };
 
 struct queueCell {
-  Elem elem;
+  token token;
   queueCell* prev;
   queueCell* next;
 };
@@ -24,6 +24,6 @@ typedef queueCell* Queue;
 
 void createEmpty (Queue&);
 bool isEmpty(const Queue&);
-void enqueue(Elem, Queue&);  /* inserisce l'elemento alla fine della lista */
-Elem dequeue(Queue&);        /* canqueueCella l'elemento in prima posizione (se esiste) e lo restituisce */
+void enqueue(token, Queue&);  /* inserisce l'elemento alla fine della lista */
+token dequeue(Queue&);        /* canqueueCella l'elemento in prima posizione (se esiste) e lo restituisce */
 }

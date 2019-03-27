@@ -19,10 +19,10 @@ void queue::createEmpty(Queue& l) // aggiunge e in coda
 }
 
 /****************************************************************/
-void queue::enqueue(Elem e, Queue& l) // aggiunge e in coda
+void queue::enqueue(token e, Queue& l) // aggiunge e in coda
 {
   queueCell* c = new queueCell; // Inizializzo una nuova cella
-  c->elem = e; // Imposto l'elemento
+  c->token = e; // Imposto l'elemento
 
   // Ricostruisco i collegamenti
   c->next = l->next; 
@@ -34,14 +34,14 @@ void queue::enqueue(Elem e, Queue& l) // aggiunge e in coda
 
 
 /****************************************************************/
-Elem queue::dequeue(Queue& l) // rimuove il primo elemento e lo restituisce
+token queue::dequeue(Queue& l) // rimuove il primo elemento e lo restituisce
 {
   if (isEmpty(l)) // Se e' vuoto
     return EMPTY_ELEM; // Non esiste alcun elemento
   
   queueCell* c = l->prev; // Ottengo l'ultima cella
 
-  Elem e = c->elem; // Ottengo l'elemento
+  token e = c->token; // Ottengo l'elemento
 
   // Ricostruisco i collegamenti
   l->prev = c->prev;

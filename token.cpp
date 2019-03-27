@@ -50,39 +50,26 @@ string int2str(int n) {
 // se stringa non vuota, la stringa perde il pezzo iniziale,
 // che diventa token.
 
-// Utilizzando uno stringstream la seguente funzione non e' compatibile,
-// per questo, sotto, abbiamo implementato una funzione equivalente
-// ma con una segnatura compatibile alla struttura dati scelta
-
 bool prossimoToken(string &s, token &t) {
-  // DA IMPLEMENTARE
-  return false;
-}
-
-bool prossimoToken(stringstream &ss, token *t) {
-  string cToken;
-
-  ss >> cToken; // Ottengo il token (questo e' possibile perche' ">> string" per stringstream si ferma allo spazio)
-
-  if (cToken.length() == 0) // Se il token ha una lunghezza = 0 (ovvero ci sono 2 spazi attaccati)
+  if (s.length() == 0) // Se il token ha una lunghezza = 0 (ovvero ci sono 2 spazi attaccati)
     return false; // Restituico errore
 
-  t->val = cToken; // Imposto il valore del token
+  t.val = s; // Imposto il valore del token
 
   // Imposto il tipo di token
-  if (cToken == "(")
-    t->k = PARENTESI_APERTA;
-  else if (cToken == ")")
-    t->k = PARENTESI_CHIUSA;
-  else if (cToken == "+")
-    t->k = OP_SOMMA;
-  else if (cToken == "-")
-    t->k = OP_SOTTRAZIONE;
-  else if (cToken == "*")
-    t->k = OP_MOLTIPLICAZIONE;
+  if (s == "(")
+    t.k = PARENTESI_APERTA;
+  else if (s == ")")
+    t.k = PARENTESI_CHIUSA;
+  else if (s == "+")
+    t.k = OP_SOMMA;
+  else if (s == "-")
+    t.k = OP_SOTTRAZIONE;
+  else if (s == "*")
+    t.k = OP_MOLTIPLICAZIONE;
   else { // Se non e' un token "facilemente riconoscibile"
-    if (isNumber(cToken)) // Controllo se e' un numero
-      t->k = NUMERO;
+    if (isNumber(s)) // Controllo se e' un numero
+      t.k = NUMERO;
     else // Se non lo e'
       return false; // Restituisco errore
   }

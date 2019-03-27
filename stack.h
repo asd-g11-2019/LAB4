@@ -10,22 +10,19 @@ using namespace std;
 
 namespace stack{
 
-// Gli elementi dello STACK sono token
-typedef token* Elem;
-
 struct stackCell {
-  Elem elem;
+  token token;
   stackCell* next;
 };
 
 typedef stackCell* Stack;
 
-const Elem ERROR = nullptr;
-const Elem EMPTY_ELEM = nullptr;
+const token EMPTY_ELEM = { "", VUOTO };
+const token ERROR = { "", ERRORE };
 const Stack EMPTY_STACK = nullptr;
 
 bool isEmpty(const Stack&);
-void push(const Elem, Stack&);	/* aggiunge elem in cima (operazione safe, si può sempre fare) */
-Elem pop(Stack&);	/* toglie dallo stack l'ultimo elemento e lo restituisce; se lo stack è vuoto 
+void push(const token, Stack&);	/* aggiunge elem in cima (operazione safe, si può sempre fare) */
+token pop(Stack&);	/* toglie dallo stack l'ultimo elemento e lo restituisce; se lo stack è vuoto 
                            viene sollevata un'eccezione) */
 }
